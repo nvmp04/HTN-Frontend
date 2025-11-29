@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getHistoryData, getDataByRange } from '../../../shared/api/endpoints';
+import { toIsoDatetimeString } from '../../../shared/utils/formatters';
 
 /**
  * Hook để quản lý lịch sử dữ liệu
@@ -38,7 +39,19 @@ export function useHistoryData() {
     setLoading(true);
     setError(null);
     try {
-      const result = await getDataByRange(startTime, endTime);
+      const s = toIsoDatetimeString(startTime);
+      const e = toIsoDatetimeString(endTime);
+
+      // Local validation: start < end
+      const sDate = new Date(s);
+      const eDate = new Date(e);
+      if (isNaN(sDate) || isNaN(eDate) || sDate >= eDate) {
+        setError('Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc và phải hợp lệ');
+        setLoading(false);
+        return;
+      }
+
+      const result = await getDataByRange(s, e);
       setData(result.reverse());
       setViewMode('range');
     } catch (err) {

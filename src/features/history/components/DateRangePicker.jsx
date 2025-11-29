@@ -25,6 +25,7 @@ export function DateRangePicker({ startTime, endTime, onStartChange, onEndChange
             type="datetime-local"
             value={startTime}
             onChange={(e) => onStartChange(e.target.value)}
+            step="1"
             className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -37,6 +38,7 @@ export function DateRangePicker({ startTime, endTime, onStartChange, onEndChange
             type="datetime-local"
             value={endTime}
             onChange={(e) => onEndChange(e.target.value)}
+            step="1"
             className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>

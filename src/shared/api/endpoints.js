@@ -1,4 +1,5 @@
 import { apiClient } from './client';
+import { toIsoDatetimeString } from '../utils/formatters';
 
 /**
  * Health check
@@ -25,10 +26,24 @@ export async function getHistoryData(limit = 100) {
  * Lấy dữ liệu theo khoảng thời gian
  */
 export async function getDataByRange(startTime, endTime) {
-  const params = new URLSearchParams({
-    start_time: startTime,
-    end_time: endTime,
-  });
+  // Ensure startTime and endTime are in the required ISO-like format
+  const s = toIsoDatetimeString(startTime);
+  const e = toIsoDatetimeString(endTime);
+
+  // Validate result format: YYYY-MM-DDTHH:mm:ss
+  const isoRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
+  if (!isoRegex.test(s) || !isoRegex.test(e)) {
+    throw new Error('start_time and end_time must be ISO format: YYYY-MM-DDTHH:mm:ss');
+  }
+
+  // Validate start < end
+  const sDate = new Date(s);
+  const eDate = new Date(e);
+  if (isNaN(sDate) || isNaN(eDate) || sDate >= eDate) {
+    throw new Error('start_time must be before end_time');
+  }
+
+  const params = new URLSearchParams({ start_time: s, end_time: e });
   return apiClient.get(`/data/range?${params}`);
 }
 
